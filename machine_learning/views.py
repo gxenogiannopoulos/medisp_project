@@ -45,5 +45,6 @@ class HistImageModelViewset(viewsets.ModelViewSet):
 
     @action(methods=["post"], detail=False, url_path="register-images")
     def register_images(self, request):
-        hist_image_serializer = self.get_serializer()
+        ...
+        hist_image_serializer = self.get_serializer(HistImage.objects.all(), many=True)
         return Response(hist_image_serializer.data, status=status.HTTP_200_OK)

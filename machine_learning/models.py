@@ -14,7 +14,7 @@ class Image(models.Model):
     file = models.FileField(upload_to="hist_images", max_length=255)
 
     class Meta:
-        managed = False
+        abstract = True
 
 
 class HistImage(Image):

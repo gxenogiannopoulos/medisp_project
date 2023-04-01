@@ -23,6 +23,8 @@ class LabelSerializer(serializers.ModelSerializer):
 
 
 class HistImageSerializer(serializers.ModelSerializer):
+    file = serializers.ImageField(use_url=False)
+
     class Meta:
         model = HistImage
-        fields = "__all__"
+        fields = ("file", "label", "magnification", "stain")

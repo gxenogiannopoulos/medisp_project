@@ -6,6 +6,8 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
+from machine_learning.models import Label, HistImage
+from machine_learning.serializers import HistImageSerializer
 from medisp_project.settings import HIST_IMAGES
 
 
@@ -49,9 +51,25 @@ class TestHistImageModelViewset(APITestCase):
         self.client.force_authenticate(user=self.user)
 
     def test_register_images(self):
-        expected_response = [
-            file for file in os.listdir(os.path.join(HIST_IMAGES, "train"))
-        ]
+        dataset_folder = os.path.join(HIST_IMAGES, "train")
+        # Prepare labels
+        labels = Label.objects.bulk_create(
+            [
+                Label(name=name)
+                for name in [folder_name for folder_name in os.listdir(dataset_folder)]
+            ]
+        )
+        id_counter = 1
+        hist_images = []
+        for label in labels:
+            image_folder = os.path.join(dataset_folder, label.name)
+            for image_filename in os.listdir(image_folder):
+                image_filepath = os.path.join(image_folder, image_filename)
+                hist_images.append(
+                    HistImage(id=id_counter, label=label, file=image_filepath)
+                )
+                id_counter += 1
+        expected_response = HistImageSerializer(hist_images, many=True).data
         response = self.client.post(reverse("hist-images-register-images"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, expected_response)
