@@ -21,7 +21,8 @@ from machine_learning import views
 router = routers.DefaultRouter()
 router.register(r"users", views.UserViewSet)
 router.register(r"groups", views.GroupViewSet)
-router.register(r"labels", views.LabelModelViewset)
+router.register(r"labels", views.LabelModelViewset, basename="labels")
+router.register(r"hist-images", views.LabelModelViewset, basename="hist-images")
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.

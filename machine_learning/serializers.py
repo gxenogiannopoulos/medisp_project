@@ -1,4 +1,4 @@
-from machine_learning.models import Label
+from machine_learning.models import Label, HistImage
 
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
@@ -19,4 +19,10 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 class LabelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Label
+        fields = "__all__"
+
+
+class HistImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HistImage
         fields = "__all__"

@@ -1,12 +1,16 @@
-from machine_learning.models import Label
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
+from machine_learning.models import Label, HistImage
 from machine_learning.serializers import (
     LabelSerializer,
     UserSerializer,
     GroupSerializer,
+    HistImageSerializer,
 )
 
 from django.contrib.auth.models import User, Group
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework import permissions
 
 
@@ -33,3 +37,13 @@ class GroupViewSet(viewsets.ModelViewSet):
 class LabelModelViewset(viewsets.ModelViewSet):
     queryset = Label.objects.all()
     serializer_class = LabelSerializer
+
+
+class HistImageModelViewset(viewsets.ModelViewSet):
+    queryset = HistImage.objects.all()
+    serializer_class = HistImageSerializer
+
+    @action(methods=["post"], detail=False, url_path="register-images")
+    def register_images(self, request):
+        hist_image_serializer = self.get_serializer()
+        return Response(hist_image_serializer.data, status=status.HTTP_200_OK)
