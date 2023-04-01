@@ -15,13 +15,27 @@ from medisp_project.settings import HIST_IMAGES
 
 
 class TestLabel(APITestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.existing_label = Label.objects.create(name="label_init")
+        cls.label_to_delete = Label.objects.create(name="label_to_delete")
+
     def setUp(self) -> None:
         self.user = User.objects.create_user(
             username="test_user", password="test_user", email='username="test@user.com"'
         )
         self.client.force_authenticate(user=self.user)
 
-    def test_post_labels(self):
+    def test_get_label(self):
+        response = self.client.get(
+            path=reverse("labels-list"),
+            data={"pk": self.existing_label.pk}
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[0]["name"], self.existing_label.name)
+
+    def test_create_label(self):
         new_label_name = "Benign"
         post_data = dict(name=new_label_name)
         create_response = self.client.post(
@@ -41,6 +55,27 @@ class TestLabel(APITestCase):
         self.assertEqual(
             create_response.data, create_response.data | {"name": MALIGNANT}
         )
+
+    def test_update_label(self):
+        response = self.client.put(
+            path=reverse(
+                "labels-detail",
+            ),
+            data={"name": "label_updated"},
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        updated_label = Label.objects.get(pk=self.existing_label.pk)
+        self.assertEqual(updated_label.name, "label_updated")
+
+    def test_delete_label(self):
+        response = self.client.delete(
+            path=reverse(
+                "labels-detail",
+            ),
+            kwargs={"pk": self.label_to_delete.pk},
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Label.objects.filter(pk=self.label_to_delete.pk).exists())
 
 
 class TestHistImageModelViewset(APITestCase):
